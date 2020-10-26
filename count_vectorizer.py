@@ -84,7 +84,7 @@ class CountVectorizer:
 
     def get_feature_names(self) -> List[str]:
         if not self._vocabulary:
-            raise AttributeError('Нодопустим вызов transform без fit')
+            raise AttributeError('Мы еще не создали список фичей. Вызовите fit')
         """
         Возвращает список токенов всего корпуса
         :return: Список токенов
