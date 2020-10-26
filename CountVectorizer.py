@@ -10,6 +10,7 @@ class CountVectorizer:
     def __init__(self, lowercase: bool = True, token_pattern=r"(?u)\b\w\w+\b"):
         self.lowercase = lowercase
         self.token_pattern = token_pattern
+        self._vocabulary = None
 
     def _preprocessing(self, texts: Iterable[str]) -> Iterable[str]:
         """
@@ -38,7 +39,7 @@ class CountVectorizer:
         counter = Counter()
         for text in texts:
             counter.update(text)
-        self._vocabulary = list(counter.keys())
+        self._vocabulary = list(counter)
 
     def _terms_counter(self, text: List[str]) -> List[int]:
         """
@@ -49,41 +50,41 @@ class CountVectorizer:
         counter = Counter(text)
         return [counter[word] for word in self._vocabulary]
 
-    def fit(self, X: Iterable) -> 'CountVectorizer':
+    def fit(self, x: Iterable) -> 'CountVectorizer':
         """
         Проводит препроцессинг и токенизацию и формирует словарь
-        :param X: корпус додументов
+        :param x: корпус додументов
         :return: объект класс
         """
-        _X = self._preprocessing(X)
-        _X = self._tokenization(_X)
-        self._extract_vocab(_X)
+        x_processed = self._preprocessing(x)
+        x_tokenized = self._tokenization(x_processed)
+        self._extract_vocab(x_tokenized)
         return self
 
-    def transform(self, X: Iterable) -> List[List[int]]:
+    def transform(self, x: Iterable) -> List[List[int]]:
         """
         Проводит препроцессинг и токенизацию и строит матрицу
         числа вхождений слов в каждый из документ корпуса
-        :param X: корпус додументов
+        :param x: корпус додументов
         :return: матрица числа вхождений
         """
-        if not hasattr(self, '_vocabulary'):
+        if not self._vocabulary:
             raise AttributeError('Нодопустим вызов transform без fit')
-        _X = self._preprocessing(X)
-        _X = self._tokenization(_X)
-        return [self._terms_counter(text) for text in _X]
+        x_processed = self._preprocessing(x)
+        x_tokenized = self._tokenization(x_processed)
+        return [self._terms_counter(text) for text in x_tokenized]
 
-    def fit_transform(self, X: Iterable) -> List[List[int]]:
+    def fit_transform(self, x: Iterable) -> List[List[int]]:
         """
         Последовательно вызывает методы fit и transform
-        :param X: корпус додументов
+        :param x: корпус додументов
         :return: матрица числа вхождений
         """
-        return self.fit(X).transform(X)
+        return self.fit(x).transform(x)
 
     def get_feature_names(self) -> List[str]:
-        if not hasattr(self, '_vocabulary'):
-            raise AttributeError('Необходимо сначала вызвать метод fit')
+        if not self._vocabulary:
+            raise AttributeError('Нодопустим вызов transform без fit')
         """
         Возвращает список токенов всего корпуса
         :return: Список токенов
