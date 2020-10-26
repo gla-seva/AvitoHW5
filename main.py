@@ -1,4 +1,4 @@
-from CountVectorizer import CountVectorizer
+from count_vectorizer import CountVectorizer
 
 if __name__ == '__main__':
     corpus = [
